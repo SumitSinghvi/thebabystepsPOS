@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/cart-store";
 import { formatINR } from "@/lib/utils";
 import type { Order } from "@/types/database";
@@ -16,6 +17,7 @@ interface OrderSubmitBarProps {
 export function OrderSubmitBar({ total, orderNumber, onOrderSaved }: OrderSubmitBarProps) {
   const { createOrder, saving } = useCartStore();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const handlePlaceOrder = async () => {
@@ -25,6 +27,7 @@ export function OrderSubmitBar({ total, orderNumber, onOrderSaved }: OrderSubmit
     // Require customer profile
     if (!useCartStore.getState().customer_id || !useCartStore.getState().customer_name || useCartStore.getState().customer_name === "Guest") {
       setError("Please set up your profile before placing an order.");
+      router.push("/store/profile");
       return;
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus, Minus } from "lucide-react";
+import { X, Plus, Minus, ImageIcon } from "lucide-react";
 import { formatINR } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
 import type { Product } from "@/types/database";
@@ -53,10 +53,27 @@ export function QuantityInputModal({ product, onClose }: QuantityInputModalProps
         </button>
 
         {/* Product Info */}
-        <h3 className="text-lg font-semibold text-text-primary pr-8">{product.name}</h3>
-        <p className="text-sm text-text-muted mt-1">
-          {formatINR(product.price_per_unit)} per {product.unit}
-        </p>
+        <div className="flex gap-4 items-start pr-8">
+          <div className="w-16 h-16 shrink-0 rounded-lg border border-border bg-surface-hover overflow-hidden relative">
+            {product.image_url ? (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <ImageIcon className="w-6 h-6 text-text-muted/30" />
+              </div>
+            )}
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-text-primary line-clamp-2">{product.name}</h3>
+            <p className="text-sm text-text-muted mt-1">
+              {formatINR(product.price_per_unit)} per {product.unit}
+            </p>
+          </div>
+        </div>
 
         {/* Quantity Input */}
         <div className="mt-6">

@@ -9,12 +9,14 @@ import { QuantityInputModal } from "./quantity-input-modal";
 
 export function ProductSelector() {
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { data: products, isLoading } = useProducts();
   const { data: categories } = useCategories();
   const productData = products || [];
 
   const filtered = productData.filter((p) => {
+    if (selectedCategory !== "All" && p.category !== selectedCategory) return false;
     if (!search) return true;
     const term = search.toLowerCase();
     return p.name.toLowerCase().includes(term) || (p.sku_name && p.sku_name.toLowerCase().includes(term));
@@ -32,6 +34,33 @@ export function ProductSelector() {
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2.5 border border-border rounded-xl bg-surface text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
         />
+      </div>
+
+      {/* Category Tags */}
+      <div className="flex gap-2.5 overflow-x-auto pb-3 pt-1 px-1 -mx-1 mb-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <button
+          onClick={() => setSelectedCategory("All")}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+            selectedCategory === "All"
+              ? "bg-primary text-white shadow-md ring-2 ring-primary/20 ring-offset-2 ring-offset-background scale-105"
+              : "bg-surface shadow-sm border border-border/40 text-text-muted hover:border-primary/30 hover:bg-primary/5 hover:text-primary hover:-translate-y-0.5"
+          }`}
+        >
+          All
+        </button>
+        {categories?.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.name)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+              selectedCategory === cat.name
+                ? "bg-primary text-white shadow-md ring-2 ring-primary/20 ring-offset-2 ring-offset-background scale-105"
+                : "bg-surface shadow-sm border border-border/40 text-text-muted hover:border-primary/30 hover:bg-primary/5 hover:text-primary hover:-translate-y-0.5"
+            }`}
+          >
+            {cat.name}
+          </button>
+        ))}
       </div>
 
       {/* Product Grid */}
