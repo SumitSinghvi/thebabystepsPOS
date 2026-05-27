@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Search, ImageIcon } from "lucide-react";
+import { Search, ImageIcon, ZoomIn } from "lucide-react";
 import { useProducts, useCategories } from "@/lib/hooks";
 import { formatINR } from "@/lib/utils";
 import type { Product } from "@/types/database";
 import { QuantityInputModal } from "./quantity-input-modal";
+import { ImageViewerModal } from "../ui/image-viewer-modal";
 
 export function ProductSelector() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [viewingImageProduct, setViewingImageProduct] = useState<Product | null>(null);
   const { data: products, isLoading } = useProducts();
   const { data: categories } = useCategories();
   const productData = products || [];
@@ -68,19 +70,36 @@ export function ProductSelector() {
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((product) => {
             return (
-              <button
+              <div
                 key={product.id}
                 onClick={() => setSelectedProduct(product)}
-                className="bg-surface border border-border rounded-xl overflow-hidden text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedProduct(product);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                className="bg-surface border border-border rounded-xl overflow-hidden text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group flex flex-col cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 {/* Product Image */}
                 {product.image_url ? (
-                  <div className="w-full h-28 bg-surface overflow-hidden">
+                  <div className="relative w-full h-28 bg-surface overflow-hidden group/image">
                     <img
                       src={product.image_url}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewingImageProduct(product);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-black/40 hover:bg-black/60 rounded-full text-white backdrop-blur-sm opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
                   </div>
                 ) : (
                   <div className="w-full h-28 bg-surface/80 border-b border-border flex items-center justify-center">
@@ -109,7 +128,7 @@ export function ProductSelector() {
                     </span>
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -133,6 +152,15 @@ export function ProductSelector() {
         <QuantityInputModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
+        />
+      )}
+
+      {/* Image Viewer Modal */}
+      {viewingImageProduct && (
+        <ImageViewerModal
+          imageUrl={viewingImageProduct.image_url}
+          altText={viewingImageProduct.name}
+          onClose={() => setViewingImageProduct(null)}
         />
       )}
     </div>

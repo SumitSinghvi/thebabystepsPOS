@@ -11,9 +11,10 @@ import type { Order } from "@/types/database";
 interface CartPanelProps {
   orderNumber: string;
   onOrderSaved: (order: Order) => void;
+  onClose?: () => void;
 }
 
-export function CartPanel({ orderNumber, onOrderSaved }: CartPanelProps) {
+export function CartPanel({ orderNumber, onOrderSaved, onClose }: CartPanelProps) {
   const profile = useCustomerProfileStore();
 
   const {
@@ -43,6 +44,14 @@ export function CartPanel({ orderNumber, onOrderSaved }: CartPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="lg:hidden p-1 -ml-1 mr-1 rounded-lg hover:bg-surface-hover text-text-muted hover:text-text-primary transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
           <h2 className="text-base font-semibold text-text-primary">Your Cart</h2>
           {items.length > 0 && (
             <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full font-medium">

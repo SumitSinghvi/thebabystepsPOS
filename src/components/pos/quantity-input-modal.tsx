@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus, Minus, ImageIcon } from "lucide-react";
+import { X, Plus, Minus, ImageIcon, ZoomIn } from "lucide-react";
 import { formatINR } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
 import type { Product } from "@/types/database";
+import { ImageViewerModal } from "../ui/image-viewer-modal";
 
 interface QuantityInputModalProps {
   product: Product;
@@ -13,6 +14,7 @@ interface QuantityInputModalProps {
 
 export function QuantityInputModal({ product, onClose }: QuantityInputModalProps) {
   const [quantity, setQuantity] = useState(1);
+  const [isViewingImage, setIsViewingImage] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   const subtotal = quantity * product.price_per_unit;
@@ -54,13 +56,22 @@ export function QuantityInputModal({ product, onClose }: QuantityInputModalProps
 
         {/* Product Info */}
         <div className="flex gap-4 items-start pr-8">
-          <div className="w-16 h-16 shrink-0 rounded-lg border border-border bg-surface-hover overflow-hidden relative">
+          <div className="w-16 h-16 shrink-0 rounded-lg border border-border bg-surface-hover overflow-hidden relative group/qmodal-img">
             {product.image_url ? (
-              <img
-                src={product.image_url}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              <>
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => setIsViewingImage(true)}
+                />
+                <button
+                  onClick={() => setIsViewingImage(true)}
+                  className="absolute inset-0 bg-black/40 opacity-0 group-hover/qmodal-img:opacity-100 transition-opacity flex items-center justify-center text-white cursor-pointer"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </button>
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <ImageIcon className="w-6 h-6 text-text-muted/30" />
@@ -132,6 +143,15 @@ export function QuantityInputModal({ product, onClose }: QuantityInputModalProps
           </button>
         </div>
       </div>
+
+      {/* Image Viewer Modal */}
+      {isViewingImage && (
+        <ImageViewerModal
+          imageUrl={product.image_url}
+          altText={product.name}
+          onClose={() => setIsViewingImage(false)}
+        />
+      )}
     </div>
   );
 }
