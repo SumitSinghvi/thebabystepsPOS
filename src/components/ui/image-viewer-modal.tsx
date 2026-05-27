@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { X, ImageIcon } from "lucide-react";
 
 interface ImageViewerModalProps {
-  imageUrl: string | null;
+  imageUrl?: string | null;
   altText: string;
   onClose: () => void;
 }
